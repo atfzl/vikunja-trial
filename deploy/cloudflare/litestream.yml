@@ -1,0 +1,12 @@
+# Values come from the container's environment (set by the Worker, src/worker.ts).
+dbs:
+  - path: /db/vikunja.db
+    replica:
+      type: s3
+      bucket: ${R2_BUCKET}
+      path: litestream/vikunja.db
+      endpoint: ${R2_ENDPOINT}
+      region: auto
+      force-path-style: true
+      access-key-id: ${R2_ACCESS_KEY_ID}
+      secret-access-key: ${R2_SECRET_ACCESS_KEY}

@@ -1,0 +1,31 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Vikunja at https://vikunja.mime8.dev: the frontend from this fork's build, the API in a
+  // container. Deploy: see README.md.
+  "name": "vikunja-staging",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "../../frontend/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api", "/api/*"],
+  },
+  "containers": [
+    { "class_name": "VikunjaApi", "image": "./Dockerfile", "max_instances": 1, "instance_type": "basic" },
+  ],
+  "durable_objects": { "bindings": [{ "name": "API", "class_name": "VikunjaApi" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["VikunjaApi"] }],
+  "vars": {
+    "PUBLIC_URL": "https://vikunja.mime8.dev/",
+    // Open only to create the first accounts; then "false" and redeploy.
+    "ENABLE_REGISTRATION": "true",
+    "R2_ENDPOINT": "https://6295577b688b6065fe5790c4e29b4455.r2.cloudflarestorage.com",
+    "R2_BUCKET": "vikunja-staging",
+  },
+  // Secrets (wrangler secret put): R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, VIKUNJA_SECRET.
+  "routes": [{ "pattern": "vikunja.mime8.dev", "custom_domain": true }],
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": { "enabled": true },
+}
