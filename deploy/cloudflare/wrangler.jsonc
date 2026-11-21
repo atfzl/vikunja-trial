@@ -17,9 +17,6 @@
   "durable_objects": { "bindings": [{ "name": "API", "class_name": "VikunjaApi" }] },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["VikunjaApi"] }],
   "vars": {
-    "PUBLIC_URL": "https://vikunja.mime8.dev/",
-    // Open only to create the first accounts; then "false" and redeploy.
-    "ENABLE_REGISTRATION": "true",
     "R2_ENDPOINT": "https://6295577b688b6065fe5790c4e29b4455.r2.cloudflarestorage.com",
     "R2_BUCKET": "vikunja-staging",
   },

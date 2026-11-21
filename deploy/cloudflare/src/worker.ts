@@ -3,8 +3,6 @@ import { Container, getContainer } from "@cloudflare/containers";
 interface Env {
   API: DurableObjectNamespace<VikunjaApi>;
   ASSETS: Fetcher;
-  PUBLIC_URL: string;
-  ENABLE_REGISTRATION: string;
   R2_ENDPOINT: string;
   R2_BUCKET: string;
   R2_ACCESS_KEY_ID: string;
@@ -20,24 +18,18 @@ export class VikunjaApi extends Container<Env> {
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
+    // Secrets and the bucket only; Vikunja's other settings are in the Dockerfile.
     this.envVars = {
       R2_ENDPOINT: env.R2_ENDPOINT,
       R2_BUCKET: env.R2_BUCKET,
       R2_ACCESS_KEY_ID: env.R2_ACCESS_KEY_ID,
       R2_SECRET_ACCESS_KEY: env.R2_SECRET_ACCESS_KEY,
-      VIKUNJA_SERVICE_PUBLICURL: env.PUBLIC_URL,
-      VIKUNJA_SERVICE_ENABLEREGISTRATION: env.ENABLE_REGISTRATION,
       VIKUNJA_SERVICE_SECRET: env.VIKUNJA_SECRET,
       VIKUNJA_SERVICE_JWTSECRET: env.VIKUNJA_SECRET,
-      VIKUNJA_FILES_TYPE: "s3",
-      VIKUNJA_FILES_BASEPATH: "files",
       VIKUNJA_FILES_S3_ENDPOINT: env.R2_ENDPOINT,
       VIKUNJA_FILES_S3_BUCKET: env.R2_BUCKET,
-      VIKUNJA_FILES_S3_REGION: "auto",
       VIKUNJA_FILES_S3_ACCESSKEY: env.R2_ACCESS_KEY_ID,
       VIKUNJA_FILES_S3_SECRETKEY: env.R2_SECRET_ACCESS_KEY,
-      VIKUNJA_FILES_S3_USEPATHSTYLE: "true",
-      VIKUNJA_SERVICE_ENABLEEMAILREMINDERS: "false",
     };
   }
 }

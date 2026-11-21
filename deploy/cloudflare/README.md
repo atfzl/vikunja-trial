@@ -5,7 +5,8 @@ This fork runs at <https://vikunja.mime8.dev> as a test app for mime8. One Worke
 - **API image:** Vikunja's own image (`vikunja/vikunja:unstable`, pinned by digest in `Dockerfile`, built from the same upstream commit as this fork's `main`) plus [Litestream](https://litestream.io).
 - **Data:** a container's disk is wiped when it sleeps. The SQLite database is restored from R2 on start and replicated back to R2 while Vikunja runs (`litestream.yml`, `start.sh`); attachments are stored in R2 directly. Bucket: `vikunja-staging`.
 - **One instance only** (`max_instances: 1`): Litestream supports a single writer.
-- **Registration** is open only to create the first accounts (`ENABLE_REGISTRATION` in `wrangler.jsonc`).
+- **Settings** are in the `Dockerfile` (`VIKUNJA_*`). A running container keeps the environment it first started with, even across a new image's rollout, so a change (and a changed secret) takes effect when the container next starts, after it has slept (`sleepAfter`).
+- **Registration** is off; set `VIKUNJA_SERVICE_ENABLEREGISTRATION=true` only while creating accounts.
 
 ## Secrets
 

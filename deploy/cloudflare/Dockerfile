@@ -18,9 +18,21 @@ COPY start.sh /start.sh
 
 USER vikunja
 WORKDIR /app/vikunja
+# Vikunja's settings live in the image, not in the Worker's vars: the Worker passes variables only
+# when a container starts, while a new image rolls out to the running instance (restarting it,
+# with Litestream syncing on shutdown). Secrets come from the Worker (src/worker.ts); changing one
+# takes effect at the next start.
 ENV VIKUNJA_SERVICE_ROOTPATH=/app/vikunja/ \
     VIKUNJA_DATABASE_TYPE=sqlite \
     VIKUNJA_DATABASE_PATH=/db/vikunja.db \
+    VIKUNJA_SERVICE_PUBLICURL=https://vikunja.mime8.dev/ \
+    VIKUNJA_SERVICE_ENABLEEMAILREMINDERS=false \
+    VIKUNJA_FILES_TYPE=s3 \
+    VIKUNJA_FILES_BASEPATH=files \
+    VIKUNJA_FILES_S3_REGION=auto \
+    VIKUNJA_FILES_S3_USEPATHSTYLE=true \
     GODEBUG=multipathtcp=0
+# "true" only while creating accounts, then back to "false" and redeploy.
+ENV VIKUNJA_SERVICE_ENABLEREGISTRATION=false
 EXPOSE 3456
 ENTRYPOINT ["/bin/sh", "/start.sh"]
