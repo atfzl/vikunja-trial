@@ -1,0 +1,45 @@
+# mime8 (https://mime8.dev, staging): replays recorded sessions of vikunja.mime8.dev against this
+# PR's head and its merge base, and posts a "mime8" check with a link to the report.
+name: mime8
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  mime8:
+    # Fork PRs have no secrets (and must not get them), so they're skipped.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      # The PR's head commit, not the default merge commit: the merge commit would show commits
+      # merged to main since the PR branched as the PR's changes.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - name: Find the merge base
+        id: base
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: echo "sha=$(git merge-base "origin/$BASE_REF" HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Check out the merge base
+        env:
+          BASE_SHA: ${{ steps.base.outputs.sha }}
+        run: git worktree add "$RUNNER_TEMP/base" "$BASE_SHA"
+      - uses: ./.github/actions/setup-frontend
+      # Both builds keep the committed src/version.json: a version stamped per build would differ
+      # between base and head and show up as a change.
+      - name: Build head
+        working-directory: frontend
+        run: pnpm build
+      - name: Build base
+        working-directory: ${{ runner.temp }}/base/frontend
+        run: pnpm install --frozen-lockfile --prefer-offline && pnpm build
+      - name: Compare with mime8
+        env:
+          MIME8_TOKEN: ${{ secrets.MIME8_TOKEN }}
+          BASE_SHA: ${{ steps.base.outputs.sha }}
+        run: npx -y @mime8/cli@0.1.0 run --base "$RUNNER_TEMP/base/frontend/dist" --head frontend/dist --base-sha "$BASE_SHA"
