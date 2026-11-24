@@ -44,4 +44,4 @@ jobs:
         env:
           MIME8_TOKEN: ${{ secrets.MIME8_TOKEN }}
           BASE_SHA: ${{ steps.base.outputs.sha }}
-        run: npx -y @mime8/cli@0.1.0 run --base "$RUNNER_TEMP/base/frontend/dist" --head frontend/dist --base-sha "$BASE_SHA"
+        run: npx -y @mime8/cli@0.1.1 run --base "$RUNNER_TEMP/base/frontend/dist" --head frontend/dist --base-sha "$BASE_SHA"
